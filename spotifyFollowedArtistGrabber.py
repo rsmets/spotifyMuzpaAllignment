@@ -3,7 +3,7 @@ import requests, json
 headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer BQBKM0I7LtOPNAp3NsfatPVQZGjx-LgT0ZVZyd2XpjFeuI_QTyyn2G35CtCbdYfQyIayBUqzJnjcAkVkjrSRLzzurYgrgm1VEH7dHLg5FuZAB76vlZjkiGHsBCLCgOU6Cu4RkoG2xCLAysJ88Irb0Q',
+    'Authorization': 'Bearer BQCTaJoji7nUjyDaYGZlfeJnFr9w1bWLuNfi6fO8LvTcM_IClEKchRMkZXTGzckwwT9HLqay6JCuLzX_CmJDVB1t1id_KqeyPvk68YyhCiKxyASuYV3fisuQIOXkbHhyKtjvfQs_Wgy-U06z-dWmyQ',
 }
 
 def getAllArtists():
@@ -11,9 +11,6 @@ def getAllArtists():
     nextUuid = getArtists(None)
     while (nextUuid):
         nextUuid = getArtists(nextUuid)
-
-
-
 
 def getArtists(afterUuid):
 
@@ -34,14 +31,30 @@ def getArtists(afterUuid):
     # print json.loads(response.text) 
 
     responseJson = json.loads(response.text) 
+    
     next = responseJson['artists']['cursors']['after']
     print next
     print responseJson['artists']['total']
 
     artists = responseJson['artists']['items']
+    writeArtistsInfoToFile(artists)
+    writeArtistsNamesToFile(artists)
+
     name = artists[0]['name']
     print name
     return next
+
+def writeArtistsInfoToFile(artists):
+    with open('artistInfoPretty.json', 'a+') as outfp:
+        # outfp.write(json.dumps(artists))
+        outfp.write(json.dumps(artists, sort_keys=True, indent=4, separators=(',', ': ')))
+
+def writeArtistsNamesToFile(artists):
+    with open('artistNames.json', 'a+') as outfp:
+        for a in artists:
+            outfp.write((a['name'].encode('utf-8').replace('"', '')))
+            outfp.write('\r\n')
+   
 
 # getArtists('0Y5tJX1MQlPlqiwlOH1tJY')
 getAllArtists()
