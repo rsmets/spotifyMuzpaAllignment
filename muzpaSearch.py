@@ -11,11 +11,11 @@ headers = {
     'cache-control': "no-cache"
     }
 
-def search():
+def search(aristName):
     url = "https://srv.muzpa.com/a/ms/media/search"
 
     # querystring = {"mp3prefered":"false","page":"0","popular_order":"false","text":"%5C.Dj+Tennis%5Cs"}
-    querystring = {"mp3prefered":"false","page":"0","popular_order":"false","text":"Dj Tennis"}
+    querystring = {"mp3prefered":"false","page":"0","popular_order":"false","text":aristName}
 
     response = requests.request("GET", url, headers=headers, params=querystring)
 
@@ -30,11 +30,22 @@ def search():
     for album in albums:
         tracks = album['tracks']
         for track in tracks:
-            if artistName in track['filename']:
+            # if artistName in track['filename']:
+            # print track['filename']
+            if matchArtist(track['filename'], "Dj Tennis") > -1:
+                print track['filename']
                 artistsOnTracks = track['artists_ids']
                 al = len(artistsOnTracks)
+                print al
                 if al < lowCount:
-                    artistsOnTracks = artistsOnTracks
+                    artistIds = artistsOnTracks
     
-    print artistsOnTracks
-search()
+    print artistIds
+
+
+def matchArtist(search, input):
+    hit = search.lower().find(input.lower())
+    print hit
+    return hit
+
+search('Dj Tennis')
