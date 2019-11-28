@@ -32,7 +32,7 @@ def search(aristName):
 
     print(response.text)
     responseJson = json.loads(response.text)
-    print '\n\n\n'
+    # print '\n\n\n'
     
     lowCount = 1000
     artistIds = []
@@ -42,7 +42,7 @@ def search(aristName):
         tracks = album['tracks']
         for track in tracks:
             # if artistName in track['filename']:
-            print track['artist']
+            # print track['artist']
             if matchArtist(track['artist'], aristName) > -1:
                 print track['artist']
                 artistsOnTracks = track['artists_ids']
@@ -57,7 +57,7 @@ def search(aristName):
 
 def matchArtist(search, input):
     hit = search.lower().find(input.lower())
-    print hit
+    # print hit
     return hit
 
 
@@ -74,18 +74,31 @@ def sub(id):
 
     print response.text
     responseJson = json.loads(response.text)
-    allSubResponses.append(allSubResponses)
+    allSubResponses.append(responseJson)
 
 
 def searchAndFollow(artistName):
     artistIds = search(artistName)
     for id in artistIds:
-        print id
+        print "sub one " + str(id)
+        
         sub(id)
+
+def readFileAndSearchAndFollow(fileInput):
+    with open(fileInput, 'r') as fp:
+        line = fp.readline()
+        while line:
+            print line
+            searchAndFollow(line.strip())
+            line = fp.readline()
 
 
 # search('Dj Tennis')
 
 s = sys.argv[1]
-searchAndFollow(s)
+# searchAndFollow(s)
+readFileAndSearchAndFollow(s)
+
 print allSubResponses
+
+allSubResponses = None
