@@ -7,6 +7,32 @@ To grab all of your Spotify followed artists:
     2) scroll to bottom of page a click "Get Token", big green button.
     3) check mark "user-follow-read"
     4) click "Request Token", big green button
+    5) copy the auth Token  
+    6) in terminal type:
+        python spotifyFollowedArtistGrabber.py THE_AUTH_TOKEN_YOU_JUST_COPIED
+        whichi looks something like:
+            python spotifyFollowedArtistGrabber.py BQAHYdRweompKPkKWjhT1JJ49Rc6vgomQ5tR0pirrQtyDUYV
+
+Let finish and you now have all of your followed Spotify artist info in files artistNames.json & artistInfoPretty.json.
 
 To then follow all of them in Muzpa:
 
+    1) go to Muzpa website and login
+    2) right click anywhere in the browser and click "Inspect" (if on Chrome)
+    3) go to the "Network" tab
+    4) click "XHR" (next to "All") in the tabs
+    5) refresh the Muzpa webpage
+    6) click on one of the captured network requests under "Name"
+    7) in the right pane "General" under it containing "Request Url", for example, scroll down to "Request Headers"
+    8) copy the value for "Cookie", most likely something like, SESS=6fb6428129bdd6927c87f31871270f6c715bc53
+    9) in terminal type:
+        python muzpaFollow.py artistNames.json COOKIE_VALUE_COPIED
+        which will loke something like:
+            python muzpaFollow.py artistNames.json SESS=6fb6428329bddc27c87f31871270f6c715bc53
+
+Upon finishing you can see all the artist in artistName.json file followed on Muzpa. There will be some extra artist followed due to having to guess at the artistId in a few instances and some "Dj" or "feat" follows.
+Just clean those up by hand. 
+
+Enjoy!
+
+I would recommend running this seasonally to keep Muzpa follow alligned with Spotify.
