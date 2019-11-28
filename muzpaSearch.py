@@ -1,4 +1,4 @@
-import requests, json, sys
+import requests, json, sys, time, random
 
 headers = {
     'Cookie': "SESS=6fb6428329bddc27c87f31871270f6c715bc53",
@@ -30,7 +30,7 @@ def search(aristName):
 
     response = requests.request("GET", url, headers=headers, params=querystring)
 
-    print(response.text)
+    # print(response.text)
     responseJson = json.loads(response.text)
     # print '\n\n\n'
     
@@ -38,25 +38,33 @@ def search(aristName):
     artistIds = []
 
     albums = responseJson['albums']
-    for album in albums:
-        tracks = album['tracks']
-        for track in tracks:
-            # if artistName in track['filename']:
-            # print track['artist']
-            if matchArtist(track['artist'], aristName) > -1:
-                print track['artist']
-                artistsOnTracks = track['artists_ids']
-                al = len(artistsOnTracks)
-                print al
-                if al < lowCount:
-                    artistIds = artistsOnTracks
-    
-    print artistIds
+    if albums: 
+        for album in albums:
+            tracks = album['tracks']
+            if tracks:
+                for track in tracks:
+                    # if artistName in track['filename']:
+                    # print track['artist']
+                    if matchArtist(track['artist'], aristName) > -1:
+                        # print track['artist']
+                        artistsOnTracks = track['artists_ids']
+                        al = len(artistsOnTracks)
+                        # print al
+                        if al < lowCount:
+                            artistIds = artistsOnTracks
+        
+    # print artistIds
     return artistIds
 
 
 def matchArtist(search, input):
-    hit = search.lower().find(input.lower())
+    if search is None or input is None:
+        return False
+
+    searchEncoded = search.encode('utf-8')
+    # print "search " + searchEncoded + " input " + input
+        
+    hit = searchEncoded.lower().find(input.lower())
     # print hit
     return hit
 
@@ -72,7 +80,7 @@ def sub(id):
 
     response = requests.request("POST", url, data=payload, headers=headers)
 
-    print response.text
+    # print response.text
     responseJson = json.loads(response.text)
     allSubResponses.append(responseJson)
 
@@ -80,13 +88,14 @@ def sub(id):
 def searchAndFollow(artistName):
     artistIds = search(artistName)
     for id in artistIds:
-        print "sub one " + str(id)
+        # print "sub one " + str(id)
         
         sub(id)
 
 def readFileAndSearchAndFollow(fileInput):
     with open(fileInput, 'r') as fp:
         line = fp.readline()
+        time.sleep(random.randint(1,6))
         while line:
             print line
             searchAndFollow(line.strip())
