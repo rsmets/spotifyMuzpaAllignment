@@ -1,0 +1,12 @@
+README
+11/28/19
+
+To grab all of your Spotify followed artists:
+
+    1) Go to https://developer.spotify.com/console/get-following/?type=artist&after=&limit=50
+    2) scroll to bottom of page a click "Get Token", big green button.
+    3) check mark "user-follow-read"
+    4) click "Request Token", big green button
+
+To then follow all of them in Muzpa:
+

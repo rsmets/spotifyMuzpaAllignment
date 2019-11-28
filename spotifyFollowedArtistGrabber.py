@@ -1,9 +1,10 @@
-import requests, json
+import requests, json, sys
 
+authToken = sys.argv[1]
 headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer BQCTaJoji7nUjyDaYGZlfeJnFr9w1bWLuNfi6fO8LvTcM_IClEKchRMkZXTGzckwwT9HLqay6JCuLzX_CmJDVB1t1id_KqeyPvk68YyhCiKxyASuYV3fisuQIOXkbHhyKtjvfQs_Wgy-U06z-dWmyQ',
+    "Authorization": "Bearer " + authToken,
 }
 
 def getAllArtists():
