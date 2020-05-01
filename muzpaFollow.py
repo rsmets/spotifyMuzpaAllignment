@@ -51,12 +51,7 @@ def trackSearch(trackName, artist):
 
     response = requests.request("GET", url, headers=headers, params=querystring)
 
-    # print(response.text)
     responseJson = json.loads(response.text)
-    # print '\n\n\n'
-    
-    lowCount = 1000
-    artistIds = []
 
     albums = responseJson['albums']
     if albums: 
@@ -69,7 +64,7 @@ def trackSearch(trackName, artist):
                     if matchString(title, trackName) > -1:
                         if matchString(track['artist'], artist) > -1:
                             print track['artist']
-                            return track['id']
+                            return {"id": track['id'], "label": track['label']['nm']}
                         # artistsOnTracks = track['artists_ids']
                         # al = len(artistsOnTracks)
                         # # print al
@@ -81,11 +76,17 @@ def trackSearch(trackName, artist):
     return -1
 
 def searchTrackAndDownload(trackName, artistName):
-    trackId = trackSearch(trackName, artistName)
+    trackInfo = trackSearch(trackName, artistName)
+    trackId = trackInfo['id']
+    trackLabel = trackInfo['label']
+    # print trackLabel
 
-    download(trackId, trackName)
+    if trackId > 0:
+        download(trackId, trackName, artistName, trackLabel)
+    else:
+        print 'NOPE'
 
-def download(id, name):
+def download(id, name, artist, label):
 
     print 'attempting download ' + str(id) + " name " + name
     url = "https://srv.muzpa.com/dwnld/track/" + str(id) + ".mp3?iframe"
@@ -96,7 +97,7 @@ def download(id, name):
     response = requests.request("GET", url, headers=headers, params=())
 
 
-    open('music/test.mp3', 'wb').write(response.content)
+    open('music/' + artist + ' - ' + name + ' [' + label + '].mp3', 'wb').write(response.content)
     # print response.text
     # responseJson = json.loads(response.text)
     # allSubResponses.append(responseJson)
@@ -167,3 +168,4 @@ headers = {
 # allSubResponses = None
 
 searchTrackAndDownload('Oedipus Complex', 'K Nass')
+# searchTrackAndDownload('Joys - Extended Mix', 'Roberto Surace')
