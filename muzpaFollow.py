@@ -1,9 +1,15 @@
 import requests, json, sys, time, random
 
-def search(aristName):
+def search(artistName):
     url = "https://srv.muzpa.com/a/ms/media/search"
 
-    querystring = {"mp3prefered":"false","page":"0","popular_order":"false","text":aristName}
+    querystring = {
+        # "matchonly":"true"
+        "mp3prefered":"false",
+        "page":"0",
+        "popular_order":"false",
+        "text":artistName
+    }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
 
@@ -21,7 +27,7 @@ def search(aristName):
             if tracks:
                 for track in tracks:
                     # print track['artist']
-                    if matchArtist(track['artist'], aristName) > -1:
+                    if matchString(track['artist'], artistName) > -1:
                         # print track['artist']
                         artistsOnTracks = track['artists_ids']
                         al = len(artistsOnTracks)
@@ -32,8 +38,70 @@ def search(aristName):
     # print artistIds
     return artistIds
 
+def trackSearch(trackName, artist):
+    url = "https://srv.muzpa.com/a/ms/media/search"
 
-def matchArtist(search, input):
+    querystring = {
+        "matchonly":"true",
+        "mp3prefered":"false",
+        "page":"0",
+        "popular_order":"false",
+        "text":trackName
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+
+    # print(response.text)
+    responseJson = json.loads(response.text)
+    # print '\n\n\n'
+    
+    lowCount = 1000
+    artistIds = []
+
+    albums = responseJson['albums']
+    if albums: 
+        for album in albums:
+            tracks = album['tracks']
+            if tracks:
+                for track in tracks:
+                    title = track['title']
+                    print title
+                    if matchString(title, trackName) > -1:
+                        if matchString(track['artist'], artist) > -1:
+                            print track['artist']
+                            return track['id']
+                        # artistsOnTracks = track['artists_ids']
+                        # al = len(artistsOnTracks)
+                        # # print al
+                        # if al < lowCount:
+                        #     artistIds = artistsOnTracks
+        
+    # print artistIds
+    # return artistIds
+    return -1
+
+def searchTrackAndDownload(trackName, artistName):
+    trackId = trackSearch(trackName, artistName)
+
+    download(trackId, trackName)
+
+def download(id, name):
+
+    print 'attempting download ' + str(id) + " name " + name
+    url = "https://srv.muzpa.com/dwnld/track/" + str(id) + ".mp3?iframe"
+
+    # payload = "{\"artist_id\":" + str(id) + ",\"revision\":\"1334161\"}"
+
+    # response = requests.request("POST", url, data=payload, headers=headers)
+    response = requests.request("GET", url, headers=headers, params=())
+
+
+    open('music/test.mp3', 'wb').write(response.content)
+    # print response.text
+    # responseJson = json.loads(response.text)
+    # allSubResponses.append(responseJson)
+
+def matchString(search, input):
     if search is None or input is None:
         return False
 
@@ -77,8 +145,9 @@ def readFileAndSearchAndFollow(fileInput):
             line = fp.readline()
 
 
-s = sys.argv[1]
-token = sys.argv[2]
+# s = sys.argv[1]
+# token = sys.argv[2]
+token = "SESS=abe178d76ef28b30b4dbbdb2515973a3175970"
 
 headers = {
     'Cookie': token,
@@ -91,8 +160,10 @@ headers = {
     }
 
 # searchAndFollow(s)
-readFileAndSearchAndFollow(s)
+# readFileAndSearchAndFollow(s)
 
-print allSubResponses
+# print allSubResponses
 
-allSubResponses = None
+# allSubResponses = None
+
+searchTrackAndDownload('Oedipus Complex', 'K Nass')
