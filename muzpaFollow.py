@@ -45,11 +45,13 @@ def trackSearch(trackName, artist):
         "matchonly":"true",
         "mp3prefered":"false",
         "page":"0",
-        "popular_order":"false",
+        "popular_order":"true",
         "text":trackName
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
+
+    time.sleep(random.randint(3,7))
 
     responseJson = json.loads(response.text)
 
@@ -64,8 +66,12 @@ def trackSearch(trackName, artist):
                     # if matchString(title, trackName) > -1:
                     if matchString(track['artist'], artist) > -1:
                         print 'FOUND TRACK ARTIST ' + artist
+                        t = track['title']
+                        st = track['subtitle']
+                        print 'title ' + t + "subt " + st
                         return {
                             "id": track['id'], 
+                            "title": t + " (" + st + ")", 
                             "label": track['label']['nm'],
                             "format": track['format'],
                         }
@@ -92,9 +98,10 @@ def searchTrackAndDownload(trackInput):
         trackId = trackInfo['id']
         trackLabel = trackInfo['label']
         format = trackInfo['format']
+        trackTitle = trackInfo['title']
         # print trackLabel
 
-        download(trackId, trackName, artistName, trackLabel, format)
+        download(trackId, trackTitle, artistName, trackLabel, format)
     else:
         print 'NOPE'
 
@@ -109,7 +116,11 @@ def download(id, name, artist, label, format):
     response = requests.request("GET", url, headers=headers, params=())
 
 
-    open('music/' + artist + ' - ' + name + ' [' + label + '].' + format, 'wb').write(response.content)
+    if label is not None:
+        open('music/' + artist + ' - ' + name + ' [' + label + '].' + format, 'wb').write(response.content)
+    else:
+        open('music/' + artist + ' - ' + name + '.' + format, 'wb').write(response.content)
+
     # print response.text
     # responseJson = json.loads(response.text)
     # allSubResponses.append(responseJson)
@@ -157,6 +168,15 @@ def readFileAndSearchAndFollow(fileInput):
             searchAndFollow(line.strip())
             line = fp.readline()
 
+def readFileAndSearchAndDownload(fileInput):
+    with open(fileInput, 'r') as fp:
+        line = fp.readline()
+        time.sleep(random.randint(1,3))
+        while line:
+            print line
+            searchTrackAndDownload(line.strip())
+            line = fp.readline()
+
 
 # s = sys.argv[1]
 # token = sys.argv[2]
@@ -180,6 +200,8 @@ headers = {
 # allSubResponses = None
 
 # searchTrackAndDownload('Oedipus Complex', 'K Nass')
-searchTrackAndDownload('Roberto Surace ~ Joys - Extended Mix')
+# searchTrackAndDownload('Roberto Surace ~ Joys - Extended Mix')
 # searchTrackAndDownload('6 AM - Original Mix', 'Sebastian Porter')
 # searchTrackAndDownload('Sebastian Porter ~ 6 AM - Original Mix')
+
+readFileAndSearchAndDownload("playlists/t_cutz")
