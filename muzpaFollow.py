@@ -61,35 +61,47 @@ def trackSearch(trackName, artist):
                 for track in tracks:
                     title = track['title']
                     print title
-                    if matchString(title, trackName) > -1:
-                        if matchString(track['artist'], artist) > -1:
-                            print track['artist']
-                            return {"id": track['id'], "label": track['label']['nm']}
-                        # artistsOnTracks = track['artists_ids']
-                        # al = len(artistsOnTracks)
-                        # # print al
-                        # if al < lowCount:
-                        #     artistIds = artistsOnTracks
+                    # if matchString(title, trackName) > -1:
+                    if matchString(track['artist'], artist) > -1:
+                        print 'FOUND TRACK ARTIST ' + artist
+                        return {
+                            "id": track['id'], 
+                            "label": track['label']['nm'],
+                            "format": track['format'],
+                        }
         
     # print artistIds
     # return artistIds
-    return -1
+    return False
 
-def searchTrackAndDownload(trackName, artistName):
-    trackInfo = trackSearch(trackName, artistName)
-    trackId = trackInfo['id']
-    trackLabel = trackInfo['label']
-    # print trackLabel
+# def searchTrackAndDownload(trackName, artistName):
+def searchTrackAndDownload(trackInput):
 
-    if trackId > 0:
-        download(trackId, trackName, artistName, trackLabel)
+    if 'Original Mix' in trackInput:
+        trackInput = trackInput[:-15]
+        print 'NEW TRACK INPUT ' + trackInput
+
+    trackNameParts = trackInput.split(' ~ ')
+    artistName = trackNameParts[0]
+    trackName = trackNameParts[1]
+
+    trackInfo = trackSearch(trackInput, artistName)
+    if trackInfo != False:
+        print 'trackInfo ' + str(trackInfo)
+        
+        trackId = trackInfo['id']
+        trackLabel = trackInfo['label']
+        format = trackInfo['format']
+        # print trackLabel
+
+        download(trackId, trackName, artistName, trackLabel, format)
     else:
         print 'NOPE'
 
-def download(id, name, artist, label):
+def download(id, name, artist, label, format):
 
     print 'attempting download ' + str(id) + " name " + name
-    url = "https://srv.muzpa.com/dwnld/track/" + str(id) + ".mp3?iframe"
+    url = "https://srv.muzpa.com/dwnld/track/" + str(id) + "." + format + "?iframe"
 
     # payload = "{\"artist_id\":" + str(id) + ",\"revision\":\"1334161\"}"
 
@@ -97,7 +109,7 @@ def download(id, name, artist, label):
     response = requests.request("GET", url, headers=headers, params=())
 
 
-    open('music/' + artist + ' - ' + name + ' [' + label + '].mp3', 'wb').write(response.content)
+    open('music/' + artist + ' - ' + name + ' [' + label + '].' + format, 'wb').write(response.content)
     # print response.text
     # responseJson = json.loads(response.text)
     # allSubResponses.append(responseJson)
@@ -167,5 +179,7 @@ headers = {
 
 # allSubResponses = None
 
-searchTrackAndDownload('Oedipus Complex', 'K Nass')
-# searchTrackAndDownload('Joys - Extended Mix', 'Roberto Surace')
+# searchTrackAndDownload('Oedipus Complex', 'K Nass')
+searchTrackAndDownload('Roberto Surace ~ Joys - Extended Mix')
+# searchTrackAndDownload('6 AM - Original Mix', 'Sebastian Porter')
+# searchTrackAndDownload('Sebastian Porter ~ 6 AM - Original Mix')
