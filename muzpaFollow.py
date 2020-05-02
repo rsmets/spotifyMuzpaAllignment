@@ -1,4 +1,4 @@
-import requests, json, sys, time, random
+import requests, json, sys, time, random, os, errno
 
 def search(artistName):
     url = "https://srv.muzpa.com/a/ms/media/search"
@@ -68,10 +68,14 @@ def trackSearch(trackName, artist):
                         print 'FOUND TRACK ARTIST ' + artist
                         t = track['title']
                         st = track['subtitle']
-                        print 'title ' + t + "subt " + st
+
+                        if st is not None:
+                            print 'title ' + t + "subt " + st
+                            t = t + " (" + st + ")"
+
                         return {
                             "id": track['id'], 
-                            "title": t + " (" + st + ")", 
+                            "title": t, 
                             "label": track['label']['nm'],
                             "format": track['format'],
                         }
@@ -81,7 +85,7 @@ def trackSearch(trackName, artist):
     return False
 
 # def searchTrackAndDownload(trackName, artistName):
-def searchTrackAndDownload(trackInput):
+def searchTrackAndDownload(trackInput, playlist, path):
 
     if 'Original Mix' in trackInput:
         trackInput = trackInput[:-15]
@@ -101,11 +105,11 @@ def searchTrackAndDownload(trackInput):
         trackTitle = trackInfo['title']
         # print trackLabel
 
-        download(trackId, trackTitle, artistName, trackLabel, format)
+        download(trackId, trackTitle, artistName, trackLabel, format, playlist, path)
     else:
         print 'NOPE'
 
-def download(id, name, artist, label, format):
+def download(id, name, artist, label, format, playlist, path):
 
     print 'attempting download ' + str(id) + " name " + name
     url = "https://srv.muzpa.com/dwnld/track/" + str(id) + "." + format + "?iframe"
@@ -115,11 +119,15 @@ def download(id, name, artist, label, format):
     # response = requests.request("POST", url, data=payload, headers=headers)
     response = requests.request("GET", url, headers=headers, params=())
 
-
+    
     if label is not None:
-        open('music/' + artist + ' - ' + name + ' [' + label + '].' + format, 'wb').write(response.content)
+        finalPath = path + '/' + artist + ' - ' + name + ' [' + label + '].' + format
+        print 'Downloading to: ' + finalPath
+        open(finalPath, 'wb').write(response.content)
     else:
-        open('music/' + artist + ' - ' + name + '.' + format, 'wb').write(response.content)
+        finalPath = path + '/' + artist + ' - ' + name + '.' + format
+        print 'Downloading to: ' + finalPath
+        open(finalPath, 'wb').write(response.content)
 
     # print response.text
     # responseJson = json.loads(response.text)
@@ -169,16 +177,22 @@ def readFileAndSearchAndFollow(fileInput):
             line = fp.readline()
 
 def readFileAndSearchAndDownload(fileInput):
+    path = './music/' + fileInput
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST:
+            raise
     with open(fileInput, 'r') as fp:
         line = fp.readline()
         time.sleep(random.randint(1,3))
         while line:
             print line
-            searchTrackAndDownload(line.strip())
+            searchTrackAndDownload(line.strip(), fileInput, path)
             line = fp.readline()
 
 
-# s = sys.argv[1]
+s = sys.argv[1]
 # token = sys.argv[2]
 token = "SESS=abe178d76ef28b30b4dbbdb2515973a3175970"
 
@@ -204,4 +218,5 @@ headers = {
 # searchTrackAndDownload('6 AM - Original Mix', 'Sebastian Porter')
 # searchTrackAndDownload('Sebastian Porter ~ 6 AM - Original Mix')
 
-readFileAndSearchAndDownload("playlists/t_cutz")
+# readFileAndSearchAndDownload("playlists/t_cutz")
+readFileAndSearchAndDownload(s)
