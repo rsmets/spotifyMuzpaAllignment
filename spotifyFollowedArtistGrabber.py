@@ -1,7 +1,7 @@
 import requests, json, sys
 
-# authToken = sys.argv[1]
-authToken = "BQBGP8jV-wdIlty8GyT3O7cnCdM1LNWlzkgTvo1B-787ffD8NkHIVi3MXYXgJ_UTR380ddUnB1elDP7afEmBDipK95hLuIA4eDDzfQnVukmQlya-hILat7h6GHKQmwD2X4pvckTbtP44randnVjE1y-aZPFTaQpwe0Bgl2dYusSHp9q3BhPuNlLTYhiDovdapqRLhhgz2N9QuXD0L_BGCWOBp1VWOpE16aDvcC37W-D0UtkbqWRAkl5smWVuFm5Cfvu6dpor0kUF84c"
+authToken = sys.argv[1]
+# authToken = "BQBrieGF1N2Egav3n5rYMV5WBVx8XjOFZ7KuDnYTVmUYDKjSGMrvVKrflCX1k-I9QZ5HX4YJRHs5N2aBxhHXqudiDQbF6k0RuYe8GlppwimUeVNqn3I_Y1wjaGOuf81jNy8iZu6BMt5KW0QZHLJt9es79MEGBgS7LQoBtoYeVH5lSznGs1on1NBqR-oSQ8wQbNGxlwTU6_UJEUIHU1T3q3XseHmTaIMxgG4bVfcTxodgl5_pFSsTtWyKvlzQkwaOsg5hR4eyA6sDMwk"
 headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ def getPlaylists():
 
     params = (
         ('limit', '50'),
-        ('offset', '1')
+        ('offset', '50')
     )
 
     response = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers, params=params)
@@ -66,20 +66,24 @@ def getPlaylists():
         name = item['name']
         id = item['id']
         owner = item['owner']['display_name']
-        if owner == 'bunz4dayz':
+        # if owner == 'bunz4dayz':
+        if 'Johan' in owner:
             tracks = getPlaylistTracks(id, name)
 
 
-    # TODO NEED TO THEN GRAB THE NEXT BATCH OF PLAYLISTS
+    # # TODO NEED TO THEN GRAB THE NEXT BATCH OF PLAYLISTS
 
-    return items
+    # return items
 
 def getPlaylistTracks(pid, pname):
 
+    offset = 0
+    total_grabbed = 0
     params = (
         ('limit', '50'),
-        ('offset', '1')
+        ('offset', str(offset))
     )
+    
 
     response = requests.get('https://api.spotify.com/v1/playlists/' + pid + '/tracks', headers=headers, params=params)
 
@@ -87,7 +91,23 @@ def getPlaylistTracks(pid, pname):
     print 'PLAYLIST: ' + pname
 
     responseJson = json.loads(response.text) 
+    print responseJson['total']
+    totalTracks = responseJson['total']
+
+    while total_grabbed < totalTracks:
+        getPlaylistTracksHelper(pid, pname, offset)
+        offset = offset + 50
+        total_grabbed = total_grabbed + 50
     
+def getPlaylistTracksHelper(pid, pname, offset):
+    
+    params = (
+        ('limit', '50'),
+        ('offset', str(offset))
+    )
+
+    response = requests.get('https://api.spotify.com/v1/playlists/' + pid + '/tracks', headers=headers, params=params)
+    responseJson = json.loads(response.text) 
     items = responseJson['items']
 
     # # print next
@@ -106,7 +126,8 @@ def getPlaylistTracks(pid, pname):
     
 def writePlayInfoToFiles(pname, tracks):
     pname = pname.replace(' ', '_')
-    with open('playlists/' + pname, 'w+') as outfp:
+    # with open('playlists/' + pname, 'w+') as outfp:
+    with open('playlists/' + pname, 'a+') as outfp: # use to append to a playlist track file
         for track in tracks:
             name = track['track']['name']
             atrist = track['track']['artists'][0]['name']
