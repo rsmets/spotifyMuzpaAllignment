@@ -51,7 +51,7 @@ def trackSearch(trackName, artist):
 
     response = requests.request("GET", url, headers=headers, params=querystring)
 
-    time.sleep(random.randint(3,7))
+    time.sleep(random.randint(2,5))
 
     responseJson = json.loads(response.text)
 
@@ -119,15 +119,29 @@ def download(id, name, artist, label, format, playlist, path):
     # response = requests.request("POST", url, data=payload, headers=headers)
     response = requests.request("GET", url, headers=headers, params=())
 
-    
+    # print 'path ' + path
+    # print 'artist ' + artist
+    # print 'name ' + name
+    # print 'label ' + label
+    # print 'format ' + format
     if label is not None:
-        finalPath = path + '/' + artist + ' - ' + name + ' [' + label + '].' + format
-        print 'Downloading to: ' + finalPath
-        open(finalPath, 'wb').write(response.content)
+        try:
+            finalPath = path + '/' + artist + ' - ' + name + ' [' + label + '].' + format
+            print 'Downloading to: ' + finalPath
+            open(finalPath, 'wb').write(response.content)
+        except:
+            print 'exception 1!!!'
+            # finalPath = path + '/' + artist + ' - ' + name + ' [' + label + '].' + format
+            return
     else:
-        finalPath = path + '/' + artist + ' - ' + name + '.' + format
-        print 'Downloading to: ' + finalPath
-        open(finalPath, 'wb').write(response.content)
+        try:
+            finalPath = path + '/' + artist + ' - ' + name + '.' + format
+            print 'Downloading to: ' + finalPath
+            open(finalPath, 'wb').write(response.content)
+        except:
+            print 'exception 222!!!'
+            # finalPath = path + '/' + artist + ' - ' + name + ' [' + label + '].' + format
+            return
 
     # print response.text
     # responseJson = json.loads(response.text)
@@ -137,11 +151,20 @@ def matchString(search, input):
     if search is None or input is None:
         return False
 
-    searchEncoded = search.encode('utf-8')
+    try:
+        searchEncoded = search.decode('utf-8')
     # print "search " + searchEncoded + " input " + input
-        
-    hit = searchEncoded.lower().find(input.lower())
+    except:
+        return False
+    
+    hit = False
+    try:
+        hit = searchEncoded.lower().find(input.lower())
+    # hit = search.lower().find(input.lower())
     # print hit
+    except:
+        return False
+
     return hit
 
 
@@ -176,6 +199,16 @@ def readFileAndSearchAndFollow(fileInput):
             searchAndFollow(line.strip())
             line = fp.readline()
 
+def readFilesInDirectory():
+    print os.getcwd()
+
+    for filename in os.listdir("playlists"):
+        # with open(os.path.join(os.cwd(), filename), 'r') as f: # open in readonly mode
+        filePath = 'playlists/' + filename
+        print filePath
+        readFileAndSearchAndDownload(filePath)
+            
+
 def readFileAndSearchAndDownload(fileInput):
     path = './music/' + fileInput
     try:
@@ -185,14 +218,14 @@ def readFileAndSearchAndDownload(fileInput):
             raise
     with open(fileInput, 'r') as fp:
         line = fp.readline()
-        time.sleep(random.randint(1,3))
+        # time.sleep(random.randint(1,3))
         while line:
             print line
             searchTrackAndDownload(line.strip(), fileInput, path)
             line = fp.readline()
 
 
-s = sys.argv[1]
+# s = sys.argv[1]
 # token = sys.argv[2]
 token = "SESS=abe178d76ef28b30b4dbbdb2515973a3175970"
 
@@ -218,5 +251,6 @@ headers = {
 # searchTrackAndDownload('6 AM - Original Mix', 'Sebastian Porter')
 # searchTrackAndDownload('Sebastian Porter ~ 6 AM - Original Mix')
 
-# readFileAndSearchAndDownload("playlists/t_cutz")
-readFileAndSearchAndDownload(s)
+# readFileAndSearchAndDownload("playlists/155.Cafe_Mambo")
+# readFileAndSearchAndDownload(s)
+readFilesInDirectory()
