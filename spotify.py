@@ -1,4 +1,4 @@
-import requests, json, sys
+import requests, json, sys, os
 
 auth_token = sys.argv[1]
 action = sys.argv[2]
@@ -8,6 +8,16 @@ headers = {
     'Content-Type': 'application/json',
     "Authorization": "Bearer " + auth_token,
 }
+
+# ensure the playlist directory is created
+path = "./playlists"
+
+try:
+    os.mkdir(path)
+except OSError:
+    print ("Creation of the directory %s failed" % path)
+else:
+    print ("Successfully created the directory %s " % path)
 
 def getAllArtists():
     total = 0
