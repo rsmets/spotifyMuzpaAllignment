@@ -1,0 +1,12 @@
+artistNames.json
+artistInfoPretty.json
+artist*
+
+music/
+node_modules/
+
+playlists_done/
+h_playlist/
+
+cypress/
+test/
