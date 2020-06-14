@@ -1,7 +1,7 @@
 import requests, json, sys
 
 auth_token = sys.argv[1]
-playlist_owner = sys.argv[2]
+action = sys.argv[2]
 
 headers = {
     'Accept': 'application/json',
@@ -169,6 +169,8 @@ def writeArtistsNamesToFile(artists):
             outfp.write('\r\n')
    
 
-
-# getAllPlaylistsByOwner("Smets")
-getAllPlaylistsByOwner(playlist_owner)
+if action == 'artists':
+    getAllArtists() # for grabbing followed artists and dumping them in artistNames.json & artistInfoPretty.json files
+elif action == 'tracks':
+    playlist_owner = sys.argv[3]
+    getAllPlaylistsByOwner(playlist_owner) # for grabbing playlist tracks from target owner and dumping them in ./playlists/<playlist_name>/<track_names>

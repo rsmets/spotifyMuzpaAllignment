@@ -9,11 +9,25 @@ To grab all of your Spotify followed artists:
     4) click "Request Token", big green button
     5) copy the auth Token  
     6) in terminal type:
-        python spotifyFollowedArtistGrabber.py THE_AUTH_TOKEN_YOU_JUST_COPIED
+        python spotify.py THE_AUTH_TOKEN_YOU_JUST_COPIED
         whichi looks something like:
-            python spotifyFollowedArtistGrabber.py BQAHYdRweompKPkKWjhT1JJ49Rc6vgomQ5tR0pirrQtyDUYV
+            python spotify.py BQAHYdRweompKPkKWjhT1JJ49Rc6vgomQ5tR0pirrQtyDUYV artists
 
 Let finish and you now have all of your followed Spotify artist info in files artistNames.json & artistInfoPretty.json.
+
+To grab all tracks from target playlist owner's Spotify playlists, i.e. this can be yourself or one of your friends. 
+
+    1) Go to https://developer.spotify.com/console/get-following/?type=artist&after=&limit=50
+    2) scroll to bottom of page a click "Get Token", big green button.
+    3) check mark "user-follow-read"
+    4) click "Request Token", big green button
+    5) copy the auth Token  
+    6) in terminal type:
+        python spotify.py THE_AUTH_TOKEN_YOU_JUST_COPIED
+        whichi looks something like:
+            python spotify.py BQAHYdRweompKPkKWjhT1JJ49Rc6vgomQ5tR0pirrQtyDUYV tracks Smets
+
+Let finish and you now have all of your target spotify user's playlist and track names in the playlists folder
 
 To then follow all of them in Muzpa:
 
@@ -26,9 +40,9 @@ To then follow all of them in Muzpa:
     7) in the right pane "General" under it containing "Request Url", for example, scroll down to "Request Headers"
     8) copy the value for "Cookie", most likely something like, SESS=6fb6428129bdd6927c87f31871270f6c715bc53
     9) in terminal type:
-        python muzpaFollow.py artistNames.json COOKIE_VALUE_COPIED
+        python muzpa.py artistNames.json COOKIE_VALUE_COPIED
         which will loke something like:
-            python muzpaFollow.py artistNames.json SESS=6fb6428329bddc27c87f31871270f6c715bc53
+            python muzpa.py artistNames.json SESS=6fb6428329bddc27c87f31871270f6c715bc53
 
 Upon finishing you can see all the artist in artistName.json file followed on Muzpa. There will be some extra artist followed due to having to guess at the artistId in a few instances and some "Dj" or "feat" follows.
 Just clean those up by hand. 
