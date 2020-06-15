@@ -51,7 +51,7 @@ def trackSearch(trackName, artist):
 
     response = requests.request("GET", url, headers=headers, params=querystring)
 
-    time.sleep(random.randint(2,5))
+    # time.sleep(random.randint(2,5))
 
     responseJson = json.loads(response.text)
 
