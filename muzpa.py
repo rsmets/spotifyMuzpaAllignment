@@ -51,7 +51,7 @@ def trackSearch(trackName, artist):
 
     response = requests.request("GET", url, headers=headers, params=querystring)
 
-    time.sleep(random.randint(2,5))
+    #time.sleep(random.randint(2,5))
 
     responseJson = json.loads(response.text)
 
@@ -225,9 +225,8 @@ def readFileAndSearchAndDownload(fileInput):
             line = fp.readline()
 
 
-# s = sys.argv[1]
-# token = sys.argv[2]
-token = "SESS=abe178d76ef28b30b4dbbdb2515973a3175970"
+token = sys.argv[1]
+action = sys.argv[2]
 
 headers = {
     'Cookie': token,
@@ -239,7 +238,13 @@ headers = {
     'cache-control': "no-cache"
     }
 
-# searchAndFollow(s)
+if action == 'artists':
+    artistFile = sys.argv[3]
+    readFileAndSearchAndFollow(artistFile) 
+elif action == 'tracks':
+    readFilesInDirectory()
+
+
 # readFileAndSearchAndFollow(s)
 
 # print allSubResponses
@@ -253,4 +258,4 @@ headers = {
 
 # readFileAndSearchAndDownload("playlists/155.Cafe_Mambo")
 # readFileAndSearchAndDownload(s)
-readFilesInDirectory()
+# readFilesInDirectory()

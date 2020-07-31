@@ -1,12 +1,23 @@
-import requests, json, sys
+import requests, json, sys, os
 
-authToken = sys.argv[1]
-# authToken = "BQBrieGF1N2Egav3n5rYMV5WBVx8XjOFZ7KuDnYTVmUYDKjSGMrvVKrflCX1k-I9QZ5HX4YJRHs5N2aBxhHXqudiDQbF6k0RuYe8GlppwimUeVNqn3I_Y1wjaGOuf81jNy8iZu6BMt5KW0QZHLJt9es79MEGBgS7LQoBtoYeVH5lSznGs1on1NBqR-oSQ8wQbNGxlwTU6_UJEUIHU1T3q3XseHmTaIMxgG4bVfcTxodgl5_pFSsTtWyKvlzQkwaOsg5hR4eyA6sDMwk"
+auth_token = sys.argv[1]
+action = sys.argv[2]
+
 headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    "Authorization": "Bearer " + authToken,
+    "Authorization": "Bearer " + auth_token,
 }
+
+# ensure the playlist directory is created
+path = "./playlists"
+
+try:
+    os.mkdir(path)
+except OSError:
+    print ("Creation of the directory %s failed" % path)
+else:
+    print ("Successfully created the directory %s " % path)
 
 def getAllArtists():
     total = 0
@@ -46,11 +57,32 @@ def getArtists(afterUuid):
     print name
     return next
 
-def getPlaylists():
+def getAllPlaylistsByOwner(playlistOwner):
+    offset = 0
+    total_grabbed = 0
+    params = (
+        ('limit', '50'),
+        ('offset', str(offset))
+    )
+
+    response = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers, params=params)
+
+    print json.loads(response.text)  
+
+    responseJson = json.loads(response.text) 
+    
+    playlistCount = responseJson['total']
+
+    while total_grabbed < playlistCount:
+        getPlaylists(playlistOwner, offset)
+        offset = offset + 50
+        total_grabbed = total_grabbed + 50
+
+def getPlaylists(playlistOwner, offset):
 
     params = (
         ('limit', '50'),
-        ('offset', '50')
+        ('offset', str(offset))
     )
 
     response = requests.get('https://api.spotify.com/v1/me/playlists', headers=headers, params=params)
@@ -67,11 +99,9 @@ def getPlaylists():
         id = item['id']
         owner = item['owner']['display_name']
         # if owner == 'bunz4dayz':
-        if 'Johan' in owner:
-            tracks = getPlaylistTracks(id, name)
-
-
-    # # TODO NEED TO THEN GRAB THE NEXT BATCH OF PLAYLISTS
+        # if 'Johan' in owner:
+        if playlistOwner in owner:
+            getPlaylistTracks(id, name)
 
     # return items
 
@@ -149,9 +179,8 @@ def writeArtistsNamesToFile(artists):
             outfp.write('\r\n')
    
 
-# getArtists('0Y5tJX1MQlPlqiwlOH1tJY')
-# getAllArtists()
-
-getPlaylists()
-
-# BQD3O5Din4szXaSGM_LGVcG6OwWaaXs-ovSvms47ivLaEE9KvnQViXKmW7wToSSxVwZ1DzRMQpTNgQ0mkSEoKK1QFhiTEReyqNHRsbiFuEJ32wCyqA-7KalUdkPjkVHlMbd4bMsFqaQ8-ZXSgckwMCENRhqiElFW2YC7hRsHYy3xHf7eBGX17JLHiy8JBKw3bAxFbRmZNaICIeu5mscgTtKYIgmdYa0FfHXIucVUPlQeMkTK1g1AFTMFqQHwasvLcTRCxFureK14B5M
+if action == 'artists':
+    getAllArtists() # for grabbing followed artists and dumping them in artistNames.json & artistInfoPretty.json files
+elif action == 'tracks':
+    playlist_owner = sys.argv[3]
+    getAllPlaylistsByOwner(playlist_owner) # for grabbing playlist tracks from target owner and dumping them in ./playlists/<playlist_name>/<track_names>
