@@ -181,6 +181,10 @@ def writeArtistsNamesToFile(artists):
 
 if action == 'artists':
     getAllArtists() # for grabbing followed artists and dumping them in artistNames.json & artistInfoPretty.json files
-elif action == 'tracks':
+elif action == 'all_playlists':
     playlist_owner = sys.argv[3]
-    getAllPlaylistsByOwner(playlist_owner) # for grabbing playlist tracks from target owner and dumping them in ./playlists/<playlist_name>/<track_names>
+    getAllPlaylistsByOwner(playlist_owner) # for grabbing all playlist tracks from target owner and dumping them in ./playlists/<playlist_name>/<track_names>
+elif action == 'playlist':
+    playlist_name = sys.argv[3]
+    playlist_id = sys.argv[4]
+    getPlaylistTracks(playlist_id, playlist_name) # for grabbing all playlist tracks from target owner and dumping them in ./playlists/<playlist_name>/<track_names>

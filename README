@@ -27,7 +27,7 @@ To grab all tracks from target playlist owner's Spotify playlists, i.e. this can
     6) in terminal type:
         python spotify.py THE_AUTH_TOKEN_YOU_JUST_COPIED
         whichi looks something like:
-            python spotify.py BQAHYdRweompKPkKWjhT1JJ49Rc6vgomQ5tR0pirrQtyDUYV tracks Smets
+            python spotify.py BQAHYdRweompKPkKWjhT1JJ49Rc6vgomQ5tR0pirrQtyDUYV all_playlists Smets
 
 Let finish and you now have all of your target spotify user's playlist and track names in the playlists folder
 
